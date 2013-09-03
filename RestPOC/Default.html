@@ -1,0 +1,134 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>RestPOC</title>
+    <script type="text/javascript" src="scripts/json2.js"></script>
+    <script type="text/javascript" src="scripts/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="scripts/underscore.min.js"></script>
+    <link rel="stylesheet" href="Styles/styles.css" type="text/css" />
+    <script type="text/javascript">
+
+        function ajax(url, method, data, callback) {
+            $.ajax({
+                url: url,
+                dataType: "json",
+                headers: credentials(),
+                data: JSON.stringify(data),
+                type: method,
+                success: callback,
+                fail: function (req,res) {
+                    console.log("error request:");
+                    console.log(req);
+                    console.log("response:");
+                    console.log(res);
+                }
+            });
+        }
+
+        function fillProducts(response) {
+            var container = $('#econ-products > .textgohere');
+            container.empty();
+            if (!response || !response.collection || !response.collection.length)
+                container.append($('<span style="color:red"/>').text('None found!'));
+            else {
+                _.each(response.collection, function (item, index) {
+                    container.append($("<p/>").text(item.name));
+                })
+            }
+        }
+        function fillBooked(response) {
+            var container = $('#econ-booked > .textgohere');
+            container.empty();
+            if (!response || !response.collection || !response.collection.length)
+                container.append($('<span style="color:red"/>').text('None found!'));
+            else {
+                _.each(response.collection, function (item, index) {
+                    container.append($("<p/>").text('orderid: ' + item.orderId + ', pris: ' + item.netAmount));
+                })
+            }
+            
+        }
+        function fillDrafts(response) {
+            var container = $('#econ-drafts > .textgohere');
+            container.empty();
+            if (!response || !response.collection || !response.collection.length)
+                container.append($('<span style="color:red"/>').text('None found!'));
+            else {
+                _.each(response.collection, function (item, index) {
+                    container.append($("<p/>").text('orderid: ' + item.orderId + ', pris: ' + item.netAmount));
+                })
+            }
+            
+        }
+
+        $(document).ready(function () {
+            $('#button').click(function () {
+                $('#pleasewait').toggle();
+                var cred = { appId: $('#appId').val(), accessId: $('#accessId').val() }
+                ajax("https://restapi.e-conomic.com/products", "GET", cred, fillProducts);
+                ajax("https://restapi.e-conomic.com/invoices/drafts", "GET", cred, fillDrafts);
+                ajax("https://restapi.e-conomic.com/invoices/booked", "GET", cred, fillBooked);
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <div id="explained">
+        <h1>Example to request products through E-conomic REST API:</h1>
+        <pre>
+            
+            var url = 'https://restapi.e-conomic.com/products';
+            var method = 'GET';
+            var credentials = {
+                appId: "asdfQWERasdfqwerasdfqawefasdfAWEFasefaS",
+                accessId: "aasdf¤4fawfW¤RQw4rqwrqWrqw¤QW¤RqW4rQw4"
+            }
+            var data = {};
+
+            $.ajax({
+                url: url,
+                dataType: "json",
+                headers: credentials,
+                data: JSON.stringify(data),
+                type: method,
+                success: function() {alert('success')},
+                fail: function (req,res) {
+                    console.log("request:");
+                    console.log(req);
+                    console.log("response:");
+                    console.log(res);
+                }
+            });
+        </pre>
+    </div>
+
+    <div id="form">
+        <div class="col">
+            appId: <input type="text" id="appId" value="" size="70"/><br/>
+            accessId: <input type="text" id="accessId" value="" size="70"/>
+            <div style="clear:both"></div>
+            <div><button id="button">Test</button> <span id="pleasewait" style="color:red;display:none;"><i>Please wait</i></span></div>
+        </div>
+        <div style="clear:both" />
+        <div class="col">
+            <div id="econ-products" class="section">
+                <h2>Products</h2>
+                <p class="textgohere"><i>Not initialized</i></p>
+            </div>
+        </div>
+        <div class="col">
+            <div id="econ-drafts" class="section">
+                <h2>Draft invoices</h2>
+                <p class="textgohere"><i>Not initialized</i></p>
+            </div>
+        </div>              
+        <div class="col">
+            <div id="econ-booked" class="section">
+                <h2>Booked invoices</h2>
+                <p class="textgohere"><i>Not initialized</i></p>
+            </div>
+        </div>              
+    </div>
+    
+</body>
+</html>

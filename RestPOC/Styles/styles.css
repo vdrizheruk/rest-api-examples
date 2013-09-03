@@ -1,0 +1,33 @@
+﻿
+body 
+{
+    font-family: Segoe UI Light;
+    margin: 20px auto;
+    display: block;
+    width: 1000px;
+}
+p {
+    margin: 0px;
+    padding: 0px;
+}
+div#form {
+    width: 900px;
+    float: left;
+}
+div.col {
+    float: left;
+    padding: 20px;
+}
+
+.section {
+    width: 350px;
+}
+
+.middlesection {
+    
+    height: 300px;
+    width: 60px;
+    display: block;
+    margin-top: 150px;
+}
+
