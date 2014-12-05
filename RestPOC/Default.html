@@ -7,12 +7,11 @@
     <link rel="stylesheet" href="Styles/styles.css" type="text/css" />
     <script type="text/javascript">
 
-        function ajax(url, method, data, callback) {
+        function ajax(url, method, callback) {
             $.ajax({
                 url: url,
                 dataType: "json",
-                headers: credentials(),
-                data: JSON.stringify(data),
+                headers: { appId: $('#appId').val(), accessId: $('#accessId').val() },
                 type: method,
                 success: callback,
                 fail: function (req,res) {
@@ -35,26 +34,26 @@
                 })
             }
         }
-        function fillBooked(response) {
+        function fillBookedInvoices(response) {
             var container = $('#econ-booked > .textgohere');
             container.empty();
             if (!response || !response.collection || !response.collection.length)
                 container.append($('<span style="color:red"/>').text('None found!'));
             else {
                 _.each(response.collection, function (item, index) {
-                    container.append($("<p/>").text('orderid: ' + item.orderId + ', pris: ' + item.netAmount));
+                    container.append($("<p/>").text('id: ' + item.id + ', pris: ' + item.netAmount));
                 })
             }
             
         }
-        function fillDrafts(response) {
+        function fillDraftInvoices(response) {
             var container = $('#econ-drafts > .textgohere');
             container.empty();
             if (!response || !response.collection || !response.collection.length)
                 container.append($('<span style="color:red"/>').text('None found!'));
             else {
                 _.each(response.collection, function (item, index) {
-                    container.append($("<p/>").text('orderid: ' + item.orderId + ', pris: ' + item.netAmount));
+                    container.append($("<p/>").text('id: ' + item.id + ', pris: ' + item.netAmount));
                 })
             }
             
@@ -63,18 +62,29 @@
         $(document).ready(function () {
             $('#button').click(function () {
                 $('#pleasewait').toggle();
-                var cred = { appId: $('#appId').val(), accessId: $('#accessId').val() }
-                ajax("https://restapi.e-conomic.com/products", "GET", cred, fillProducts);
-                ajax("https://restapi.e-conomic.com/invoices/drafts", "GET", cred, fillDrafts);
-                ajax("https://restapi.e-conomic.com/invoices/booked", "GET", cred, fillBooked);
+                submit();
+                $('#pleasewait').toggle();
             });
+
+            $('input, #appId, #accessId').keydown(function(e) {
+                if (e.keyCode == 13) {
+                    submit();
+                }
+            })
         });
+
+
+        function submit() {
+            ajax("https://restapi.e-conomic.com/products", "GET", fillProducts);
+            ajax("https://restapi.e-conomic.com/invoices/drafts", "GET", fillDraftInvoices);
+            ajax("https://restapi.e-conomic.com/invoices/booked", "GET", fillBookedInvoices);
+        }
 
     </script>
 </head>
 <body>
     <div id="explained">
-        <h1>Example to request products through E-conomic REST API:</h1>
+        <h1>Example to request products and invoices through E-conomic REST API:</h1>
         <pre>
             
             var url = 'https://restapi.e-conomic.com/products';
@@ -104,8 +114,8 @@
 
     <div id="form">
         <div class="col">
-            appId: <input type="text" id="appId" value="" size="70"/><br/>
-            accessId: <input type="text" id="accessId" value="" size="70"/>
+            appId: <input type="text" id="appId" value="" size="70" placeholder="use 'demo' to try it out"/><br/>
+            accessId: <input type="text" id="accessId" value="" size="70" placeholder="use 'demo' to try it out"/>
             <div style="clear:both"></div>
             <div><button id="button">Test</button> <span id="pleasewait" style="color:red;display:none;"><i>Please wait</i></span></div>
         </div>
